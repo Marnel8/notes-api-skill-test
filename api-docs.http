@@ -11,10 +11,12 @@ Use REST Client extension in VS Code or import to Postman.
 # AUTHENTICATION - Google OAuth Flow
 ###############################################################################
 
+###
 # Step 1: Get the Google OAuth URL
 # This returns an auth_url that you need to open in your browser
 GET {{baseUrl}}/auth/google
 
+###
 # Step 2: After opening the URL and signing in with Google, you'll be redirected
 # Copy the 'code' paramter from the redirect URL (it looks like: 4%2F0Ab32j...)
 # Replace the code value below and send this request to get your JWT token
