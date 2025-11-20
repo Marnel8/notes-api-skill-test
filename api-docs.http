@@ -1,0 +1,111 @@
+# Notes API Documentation
+
+Use REST Client extension in VS Code or import to Postman.
+
+@baseUrl = http://localhost:3000/api
+@accessToken = your-token-here
+@noteId = note-id-here
+@userId = user-id-here
+
+###############################################################################
+# AUTHENTICATION - Google OAuth Flow
+###############################################################################
+
+# Step 1: Get the Google OAuth URL
+# This returns an auth_url that you need to open in your browser
+GET {{baseUrl}}/auth/google
+
+# Step 2: After opening the URL and signing in with Google, you'll be redirected
+# Copy the 'code' paramter from the redirect URL (it looks like: 4%2F0Ab32j...)
+# Replace the code value below and send this request to get your JWT token
+POST {{baseUrl}}/auth/google/callback
+Content-Type: application/json
+
+{
+  "code": ""
+}
+
+# Step 3: Copy the access_token from the response above and set it in @accessToken variable
+# Then use it in the Authorization header for all protected endpoints below
+
+### Validate token
+POST {{baseUrl}}/auth/validate
+Authorization: Bearer {{accessToken}}
+
+### Get user profile
+GET {{baseUrl}}/auth/profile
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# NOTES - All endpoints require authentication
+###############################################################################
+
+### Create note
+POST {{baseUrl}}/notes
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "My First Note",
+  "content": "This is the content of my note.",
+  "tags": ["todo", "important"],
+  "category": "work"
+}
+
+### Get all notes (with pagination)
+# Query params: page (default: 1), limit (default: 10), category (optional), tag (optional)
+GET {{baseUrl}}/notes?page=1&limit=10
+Authorization: Bearer {{accessToken}}
+
+### Get notes filtered by category
+GET {{baseUrl}}/notes?page=1&limit=10&category=work
+Authorization: Bearer {{accessToken}}
+
+### Get notes filtered by tag
+GET {{baseUrl}}/notes?page=1&limit=10&tag=important
+Authorization: Bearer {{accessToken}}
+
+### Get note by ID
+GET {{baseUrl}}/notes/{{noteId}}
+Authorization: Bearer {{accessToken}}
+
+### Update note
+PUT {{baseUrl}}/notes/{{noteId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Updated Note Title",
+  "content": "Updated content here.",
+  "tags": ["updated", "important"],
+  "category": "personal"
+}
+
+### Delete note
+DELETE {{baseUrl}}/notes/{{noteId}}
+Authorization: Bearer {{accessToken}}
+
+###############################################################################
+# USER MANAGEMENT - Admin only
+###############################################################################
+
+### Get all users
+GET {{baseUrl}}/users
+Authorization: Bearer {{accessToken}}
+
+### Get user by ID
+GET {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+
+### Make user admin
+# Note: Role guard is commented out for testing - you'll need to login again after promoting
+PUT {{baseUrl}}/users/{{userId}}/make-admin
+Authorization: Bearer {{accessToken}}
+
+### Make user regular
+PUT {{baseUrl}}/users/{{userId}}/make-regular
+Authorization: Bearer {{accessToken}}
+
+### Delete user
+DELETE {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{accessToken}}
